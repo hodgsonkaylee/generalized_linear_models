@@ -1,0 +1,647 @@
+\documentclass{svproc}
+
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{graphics}
+
+\begin{document}
+\mainmatter              % start of a contribution
+%
+\title{The Logistic Distribution: 
+\\
+Estimates of Parameters}
+%
+\titlerunning{Logistic Distribution}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+\author{Kaylee Hodgson}
+\institute{Brigham Young University}
+%
+\authorrunning{Kaylee Hodgson} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+This paper evaluates the logistic distribution, its parameters, and estimates of its parameters. I begin by introducing the distribution's history, definition, and applications. I then discuss the parameters of this distribution and use three different methods to derive the estimates of these parameters. I implement these three methods to calculate the estimates of a dataset on contraceptive prevalence. Lastly, I implement a simulation study to test the accuracy of my estimator functions.
+% We would like to encourage you to list your keywords within
+% the abstract section using the \keywords{...} command.
+\keywords{logistic distribution, maximum likelihood estimators, Bayesian, method of moments, metropolis-hastings, Gibbs sampling}
+\end{abstract}
+%
+\section{Introduction}
+
+The logistic distribution is a symmetric continuous distribution. Its probability density function (pdf) is
+
+\begin{equation}
+f(x| \mu,\beta) = \frac{e^{-\frac{x-\mu }{\beta }}}{\beta (1+e^{-\frac{x-\mu }{\beta }})^2}
+\label{1.1}
+\end{equation}
+
+\bigskip
+
+for $-\infty < x < \infty$, $-\infty < \mu < \infty$, $\beta > 0$. The distribution's expected value and variance are
+
+\begin{equation}
+E(x) = \mu
+\label{1.2}
+\end{equation}
+
+\begin{equation}
+Var(x) = \sigma^2 = \frac{\pi^2 \beta^2}{3}
+\label{1.3}
+\end{equation}
+
+The logistic distribution closely resembles the normal distribution, both in appearance and application. Figure 1 plots the normal distribution curves over the logistic distribution curves to illustrate the visual similarities between the distributions. The logistic density function has more area in the tails than the normal, but the two curves are otherwise similar.
+
+\begin{figure}
+\begin{center}
+\caption{Logistic vs Normal Distribution}
+\includegraphics[width=11cm,height=6cm]{logistic-normal}
+\label{plot1}
+\smallskip
+\end{center}
+\end{figure}
+
+\smallskip
+
+\subsection{History and Applications}
+
+The logistic distribution, formerly called the logistic growth function, was originally developed by Pierre-François Verhulst for demographic research on population growth in 1838. Its application was expanded in the 1900s as a measure of growth in biology studies, distribution of income, suvival analysis, agricultural production, and public health studies. 
+
+The most common application of this distribution today is for logistic regression. Logistic regression provides inferential analysis of data with categorical dependent variables. The dependent variables approximate at a binomial distribution, and the probability parameter $(p)$ of the binomial distribution is equal to the cumulative distribution function (CDF) of the logistic distribution, which is
+
+\begin{equation}
+F(x| \mu,\beta) = \frac{1}{1+e^{-\frac{x-\mu }{\beta }}}
+\label{1.4}
+\end{equation}
+
+\bigskip
+
+Similar to the way the logistic distribution resembles the normal distribution, logistic regression of dichotomous categorical variables parallels the probit regression model, which utilizes the normal distribution. The logistic distribution is often chosen over the normal for these regression analyses because of its heavier tails, which increases the robustness of studies, and its simple CDF, which makes calculations easier than with a normal distribution.
+
+The logistic distribution's probability density function is still used today to estimate life data and population growth models because it models a curve that represents the increase and decline of growth patterns. The distribution, specifically its general model, has also become an important model in analysis of extreme values, such as extreme shifts in stock market data. The pdf of this distribution is also used to measure electron energies in electron transport, to model the distribution of long-term rainfall and river flow, and to calculate chess ratings in the United States.  
+
+The logistic distribution is often used for data that resembles a normal distribution. Because the two distributions are so similar, data that approximates at a normal is often indistinguishable from data that approximates at a logistic, unless large amounts of data are collected.
+
+\section{Estimating Parameters}
+
+The logistic distribution has two parameters, $\mu$ and $\beta$. $\mu$ is the mean, or location, parameter that gives the center of the distribution's probability density function. As the mean shifts, the entire density curve shifts along the x axis. The $\beta$ parameter is the scale parameter, which determines the width and height of the density curve. Higher scale values result in a highter peak and thinner tails. The plots in Figure 2 demonstrate how the pdf and CDF curves of the distribution change as the parameter values change.
+
+\begin{figure}[H]
+\begin{center}
+\caption{Logistic Distribution with Different Parameters}
+\includegraphics[width=11cm,height=6cm]{different-parameters}
+\label{plot2}
+\end{center}
+\end{figure}
+
+The estimators for the parameters of the logistic distribution model can be derived in multiple ways. This section will derive these estimators using three different methods: method of moments, maximum likelihood estimates, and Bayesian estimates. 
+
+\subsection{Method of Moments}
+
+One way to derive the estimators for the parameters is the method of moments. The method of moments solves for the parameters using the moment functions for the distribution. This is, specifically for the logistic distribution, easy to compute. Samples are then randomly drawn from the dataset or simulation data, and their moments are calculated, then plugged into the functions to solve for the parameters. The method provides fairly consistent estimates. However, the disadvantage of this method is that the estimators are often biased and their derivation are based on weak assumptions. The method of moments estimators are often a good starting point for finding more accurate, unbiased parameters estimates, which I will employ in the next sections to estimate the maximum likelihoods and Bayesian estimates.  
+
+The first moment, or the mean, of the logistic distribution is 
+
+\begin{equation}
+E(X) = \mu 
+\label{2.8}
+\end{equation}
+
+The variance of the logistic distribution is
+
+\begin{equation}
+V(X) = E(X^2) - (E(X))^2 = \frac{\pi^2 \beta^2}{3}
+\label{2.9}
+\end{equation}
+
+To find estimates of the parameters, I solve for $\hat{\mu}$ and $\hat{\beta}$ under the assumption that our sample mean ($\bar{x}$) and variance ($\sigma^2$) will approximate at the population mean and variance. So, using this method, I find 
+
+\begin{equation}
+\hat{\mu}_{MOM} = \bar{x} 
+\label{2.10}
+\end{equation}
+
+\begin{equation}
+s^2 = \frac{\pi^2 \beta^2}{3} \Rightarrow \hat{\beta}_{MOM} = \sqrt{3 \frac{s^2}{\pi^2}}
+\label{2.11}
+\end{equation}
+
+\subsection{Maximum Likelihood Estimates}
+
+The maximum likelihood estimate method gives an estimate $\hat{\theta}_{MLE}$ of the parameters given $x_1$, \ldots, $x_n$ by maximizing the likelihood function, which is done by taking the logarithm of that function. I use the Newton-Raphson method to find the maximum likelhood estimates. The Newton-Raphson function employs a root-finding algorithm to derive the numerical estimates. The initial values for the parameter estimates used for this method are the method of moments estimates. The algorithm takes these initial values for each of the parameters and finds the tangent lines for that point on the curve. The algorithm then replaces the original guess with the x-intercept for the tangent line, which is a better estimate than the initial guess. This method is iterative and should theoretically eventually converge to an estimate of the parameters. The implementation of this method requires the log likelihood function, and its partial derivatives with respect to each of the parameters, which gives us the gradient vector. I then take the partial derivatives of each of the gradient functions to find the hessian matrix. 
+
+The log likelihood function is
+
+\begin{equation}
+L(\theta) = -\sum_{i=1}^{n} \frac{(x-\mu)}{\beta} - n \log(\beta) - 2 n \log(e^{-\frac{x-\mu}{\beta }} + 1)
+\label{2.1}
+\end{equation}
+
+The gradient vector is 
+
+{\large
+$$
+\nabla l = \begin{bmatrix} \frac{\partial L}{\partial \mu} \ \frac{\partial L}{\partial \beta}\end{bmatrix}
+$$}
+
+{\scriptsize
+\begin{equation}
+\frac{\partial L}{\partial \mu} = \frac{n}{\beta} - 2 \sum_{i=1}^{n} \frac{e^{-\frac{x-\mu}{\beta}}}{\beta (e^{-\frac{x-\mu}{\beta}}+1)}
+\label{2.2}
+\end{equation}}
+
+{\scriptsize
+\begin{equation}
+\frac{\partial L}{\partial \beta} = \sum_{i=1}^{n} \frac{(x-\mu)}{\beta^2} - \frac{n}{\beta} - 2 \sum_{i=1}^{n} (x-\mu) \frac{e^{-\frac{x-\mu}{\beta}}}{\beta^2(e^{-\frac{x-\mu}{\beta}}+1)}
+\label{2.3}
+\end{equation}}
+
+The hessian matrix is
+
+\makeatletter
+\renewcommand*\env@matrix[1][\arraystretch]{%
+  \edef\arraystretch{#1}%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols c}}
+\makeatother
+
+$$
+Dl = \begin{bmatrix}[2] \frac{\partial ^2L}{\partial \mu^2} \ \frac{\partial ^2L}{\partial \beta \partial \mu} \\
+\frac{\partial ^2L}{\partial \beta \partial \mu} \ \frac{\partial ^2L}{\partial \beta^2}
+\end{bmatrix}
+$$
+
+\bigskip
+
+{\scriptsize
+\begin{equation}
+\frac{\partial ^2L}{\partial \mu^2} = - 2 \sum_{i=1}^{n} \frac{e^{-\frac{x-\mu}{\beta}}}{\beta^2(1+e^{-\frac{x-\mu}{\beta}})^2}
+\label{2.4}
+\end{equation}
+
+\begin{equation}
+\begingroup\makeatletter\def\f@size{5}\check@mathfonts
+\frac{\partial ^2L}{\partial \beta \partial \mu} = - \frac{n}{\beta^2} + 2 \sum_{i=1}^n \frac{e^{-\frac{x-\mu}{\beta}}}{\beta^2 (e^{-\frac{x-\mu}{\beta}} + 1)} - 2 \sum_{i=1}^{n} \frac{(x-\mu) e^{-\frac{x-\mu}{\beta}}}{\beta^3 (e^{-\frac{x-\mu}{\beta}} + 1} + 
+2 \sum_{i=1}^{n} \frac{(x-\mu) e^{-2\frac{x-\mu}{\beta}}}{\beta^3 (e^{-\frac{x-\mu}{\beta}} + 1)^2}
+\endgroup
+\label{2.5}
+\end{equation}
+
+\begin{equation}
+\frac{\partial ^2L}{\partial \beta \partial \mu} = - \frac{n}{\beta^2} + 2 \sum_{i=1}^n \frac{e^{-\frac{x-\mu}{\beta}}}{\beta^2 (e^{-\frac{x-\mu}{\beta}} + 1)} - 2 \sum_{i=1}^{n} \frac{(x-\mu) e^{-\frac{x-\mu}{\beta}}}{\beta^3 (e^{-\frac{x-\mu}{\beta}} + 1} \\
++ 2 \sum_{i=1}^{n} \frac{(x-\mu) e^{-2\frac{x-\mu}{\beta}}}{\beta^3 (e^{-\frac{x-\mu}{\beta}} + 1)^2}
+\label{2.6}
+\end{equation}
+
+\begin{equation}
+\frac{\partial ^2L}{\partial \beta^2} =  -2 \sum_{i=1}^{n} \frac{x-\mu}{\beta^3} + \frac{n}{\beta^3} - 2 \sum_{i=1}^{n} \frac{(x-\mu)^2 e^{-\frac{x-\mu}{\beta}}}{\beta^2 (1+e^{-\frac{x-\mu}{\beta}})} + 2 \sum_{i=1}^{n} \frac{(x-\mu)^2 e^{-2\frac{x-\mu}{\beta}}}{\beta^2 (1 + e^{-\frac{x-\mu}{\beta}})^2}
+\label{2.7}
+\end{equation}
+}%
+
+\bigskip
+
+The algorithm to derive these likelihoods is as follows:
+\begin{enumerate}
+\item The 1x2 vector \textbf{$\theta$} contains the initial guesses for the estimate of $\mu$ and of $\beta$. 
+\item initial count = 0
+\item while the absolute value of the gradient ($\nabla l$) evaluated at $\theta$ is greater than $\epsilon$, count = count + 1 and \textbf{$\theta$} = \textbf{$\theta$} - ($\nabla l$ x $Dl$)$^{-1}$
+\item \textbf{$\theta$} = vector of maximum likelihood estimates for the parameters 
+\end{enumerate}
+
+The algorithm should run until it converges to $\hat{\mu}_{MLE}$ and $\hat{\beta}_{MLE}$, with a certain level of tolerance. 
+
+\subsection{Bayesian Estimates}
+
+Using Bayesian analysis, I can also derive the estimators of the logistic distribution. The Bayesian estimation method operates under the assumption that the parameters of the distribution are each random variables distributed along a separate distribution. This allows me to assign distributions to these parameters called the priors. The probability density funtions of the parameter distributions are then multiplied by the likelihood function of the original distribution to create a new distribution. This new function gives me an updated distribution called our posterior. The performance of my Bayesian estimates largely depends on the accuracy of our prior assignments. If these are chosen well, I can get very accurate estimate results for our data sample. So, for the logistic distribution, $\mu$ and $\beta$ are both estimated at another distribution. These are the priors. The priors are then plugged into the log-likelihood function. For example, if I assign an exponential distribution to both of the paraemeters with $\lambda=1$, their pdfs become
+
+\begin{equation}
+f(\mu| \lambda=1) = e^{-\mu}
+\label{4.1}
+\end{equation}
+
+\begin{equation}
+f(\beta| \lambda=1) = e^{-\beta}
+\label{4.2}
+\end{equation}
+
+\bigskip
+
+So multiplying these by the pdf of the logistic function, taking the log of the combined function, then finding the complete functions for each of the parameters (which includes only the portions of the log-likelihood function that include that parameter), I get:
+
+\begin{equation}
+L(\mu) = -\sum_{i=1}^{n} \frac{(x-\mu)}{\beta} - 2 n \log(e^{-\frac{x-\mu}{\beta }} + 1) - \mu
+\label{3.1}
+\end{equation}
+
+\begin{equation}
+L(\beta) = -\sum_{i=1}^{n} \frac{(x-\mu)}{\beta} - n \log(\beta) - 2 n \log(e^{-\frac{x-\mu}{\beta }} + 1) - \beta
+\label{3.2}
+\end{equation}
+
+\bigskip
+
+I then employ Gibbs sampling to draw random samples from the posterior distribution. Gibbs sampling takes each random variable and draws from its conditional distribution to generate the random sample. The algorithm to find the posterior, then run Gibbs sampling to find the Bayesian estimates of the parameters is as follows:
+
+\begin{enumerate}
+\item Find the complete $\mu$ and $\beta$ functions that add the log of the priors to the log-likelihood function
+\item Set initial values for current $\mu$ and $\beta$ using the method of moments estimates
+\item Generate proposals for $\mu$ and $\beta$ from a random normal distribution
+\item Calculate the value from Gibbs sampling
+\item If the value is greater than the log of one draw from a random uniform, $\beta$ gets the proposal. Else, $\beta$ gets the previous draw
+\item The average of the draws for $\mu$ and $\beta$ are then calculated
+\end{enumerate}
+
+The algorithm will return the estimates $\hat{\mu}_{Bayes}$ and $\hat{\beta}_{Bayes}$ drawn from the posterior distribution.
+
+\section{Dataset}
+
+The dataset selected for the logistic distribution analysis is the World Bank's 2016 data from 127 countries on the percentage of women between ages 15 and 49 who have access to contraceptives. This can include any type of contraceptive, from birth control pills to IUDs to condoms. The data are given as the percentage of women who have access to and use contraceptives. This data is appropriate for logistic distribution estimates because the support for this dataset falls within the support for the logistic distribution. The logistic distribution's support is $-\infty < x < \infty$, so percentage values greater than $0$ are appropriate for this distribution. 
+
+The data's distribution is also shaped similar to the logistic density curve, with a bell shape and relatively heavy tails. The  histogram and density curve of the data in Figure 3 illustrate the general distribution of the prevalence of contraceptives in these 127 countries. The sample density curve is plotted against the logistic density curve to illustrate the similarities.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=10cm,height=8cm]{Data-Density}
+\label{plot3}
+\smallskip
+\caption{Density of Contraceptive Data}
+\end{center}
+\end{figure}
+
+Figure 4 illustrates the prevalence of contraceptives in different countries around the world. Dark green countries are the ones with the highest percentage of contraceptive prevalence, while red countries have lower percentages. The figure illustrates important aspects of the distribution of contraceptives. The African continent is clearly the area in the world with the least access to contraceptives, along with some parts of western Asia. This is unsurprising, given that many of these countries are less economically developed. On the other hand, China appears to have one of the highest prevalence of contraceptive use. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=12cm,height=8cm]{image}
+\label{plot4}
+\caption{World Map of Contraceptive Prevalence (in \%) in 127 Countries in 2016}
+\medskip
+\small
+Green indicates higher prevalence. Red indicates lower prevalence.
+\end{center}
+\end{figure}
+
+Access to contraceptives is crucial to women's health and advancement. Without contraceptives, women lose control over family planning, which is harmful to both the woman and her subsequent child. A lack of contraceptives also increases the risks for sexually transmitted disease for both men and women. Without increased prevalence of contraceptives, women's progression is often stunted. It is therefore important to understand the level of access women have to contraceptives and to work toward greater accessibility for these women.
+
+This analysis will evaluate the distribution of the data, including the approximate world average for contraceptive prevalence. To find this, I employ the three methods for estimating the parameters that were introduced earlier. I then address results and discuss the implications of these results.
+
+\subsection{Estimators}
+
+I run the Method of Moments (MOM), Maximum Likelihood Estimate (MLE), and Bayesian estimate functions on this data. For the Bayesian estimator, I chose the standard normal distribution as my prior for the distribution of both $\mu$ and $\beta$ because they are shaped approximately normally.
+
+To find the confidence interval for both the maximum likelihood estimators and the method of moments estimators, I employ the bootstrap method, where I sample multiple times from the sample data to obtain the confidence interval. I do this because I do not know the parameters for the distribution of the population, instead I have to base the interval off the sample data. This is also a more accurate approximation than other methods. Then to calculate these confidence intervals from my data, I add and subtract the 0.025 and 0.975 quantiles multiplied by the standard error (from my bootstrap sampling) to the mean of my sampled data. The confidence interval for the Bayesian estimates is referred to as a credible interval. To calculate this, I take draws from my posterior distribution and again calculate the quantiles for those. This confidence interval needs to be calculated differently from the other two because we are assigning priors to the parameters, which gives a different distribution (the posterior) to draw our sample data from.
+
+When I run the estimator functions and confidence intervals on my data, I obtain the results found in Table 1 and Figure 5 on page 10. 
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+  &\multicolumn{3}{|c|}{$\mu$}\\
+\hline
+ & MOM & MLE & Bayesian \\
+\hline
+Estimate & 47.74 & 48.83 & 46.47\\
+\hline
+95\% CI & (43.90, 51.54) & (44.39, 53.37) & (42.26,50.90)\\
+\hline
+\hline
+& \multicolumn{3}{|c|}{$\beta$} \\
+\hline
+ & MOM & MLE & Bayesian \\
+\hline
+Estimate & 12.51 & 13.69 & 13.64 \\
+\hline
+95\% CI & (11.47, 13.56) & (12.31, 15.02) & (11.86,15.84)\\
+\hline
+\end{tabular}
+\medskip
+\caption{Parameter Estimates for Contraceptives Data}
+\label{tab1}
+\end{center}
+\end{table}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=12cm,height=6cm]{data-parameter-est}
+\label{plot5}
+\caption{Distribution of Parameter Estimates for Data}
+\end{center}
+\end{figure}
+
+\smallskip
+
+The method of moments, maximum likelihood estimates, and Bayesian estimates for $\mu$ are very close and their confidence intervals are all fairly narrow. The first plot in Figure 5 shows the similiarities in the curves of the distributions of the three estimaters for $\mu$. All three estimator results follow approximately the same curve. The estimates of $\beta$ are slightly less similar, with the Bayesian estimate falling slightly lower than the other two estimates, but the confidence intervals for the three estimates of $\beta$ are also narrow. 
+
+I plot the logistic density curve for each of the estimated parameters against the density plot of the data in Figure 6 on page 10. All of the estimators follow approximately the same curve. Because the data does not exactly follow a logistic distribution, it will not completely match a logistic curve. However, the mean of the data appears to have similar placement to the estimator densities, and the tails of the estimate distributions match well with the data.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=9.5cm,height=7cm]{data-distribution-est}
+\label{plot6}
+\caption{Density Curves given the Parameter Estimates of the Data}
+\end{center}
+\end{figure}
+
+The estimators indicate that the location parameter $\mu$, or the mean, of the data is likely somewhere between 41\% and 53\%. The results suggest that somewhere around 50\% of women in the world have access to and use contraceptives. Why is this important to understand?
+
+Acknowledgement of an issue can help us begin to think about its implications. As mentioned before, many of the countries where contraception is less prevalent are under developed countries. Women in poorer areas have a double burden, where both their gender and their economic status contribute to their oppression. If a woman in this situation also does not have control over her own body in determining if and when she wants to have children, this leads to even greater oppression. Having a child at a young age makes upward economic mobility even less possible, making the negative impacts cyclical on future generations. Bearing children at young ages and in high volumes, as is often the case when contraceptives are not an option, can also lead to greater economic burdens on the family, and often specifically on the mother who will have to provide economically for these children. This is also concerning for the woman's health. In poorer areas, because of the lack of proper facilities and professionals, mortality rates for mothers and their babies are already high, and many additional health problems can occur for girls who bear children too young.
+
+Further research needs to be done to determine the best ways to address this issue, whether it's through legislation, grassroots efforts, or international development aid. However, understanding the descriptive statistics of the prevalence is an important place to start.
+
+The logistic distribution and its estimators appear to approximate the distribution farily accurately. However, in order to rigorously test the accuracy of these estimators, a simulation study is required.
+
+\section{Simulation Study}
+
+The simulation study is run to test the accuracy of the three methods for estimating parameters: method of moments (MOM), maximum likelihood estimation (MLE), and Bayesian estimation. The simulation is derived from the inverse of the cumulative distribution function in Equation \ref{5.01}. I obtain random variables from a uniform distribution, then plug each of those numbers into the inverse of the CDF, which gives me approximately the same distribution as the CDF of $x$. I can then plug these numbers into the different estimator functions to estimate the parameters. 
+
+\begin{equation}
+F^{-1}(y) = - \beta \log(1/y-1) + \mu
+\label{5.01}
+\end{equation}
+
+\bigskip
+
+The combinations of parameters tested in the simulation study are $\mu=5$ and $\beta=5$, $\mu=20$ and $\beta=5$, $\mu=50$ and $\beta=20$, and $\mu=100$ and $\beta=10$. For each of these parameter combinations, I test with $n=100$, $n=500$, and $n=1000$. These parameter and sample size combinations are chosen in order to test the parameter estimates at different levels. High and low values are chosen for both of the parameters to fully test the accuracy of the estimator functions by determining if they are effective at estimating varied parameter values. Different $n$'s were chosen in order to analyze whether the accuracy of the estimators improve as the sample size increases. I take the average of estimates from multiple draws of the samples. I then calculate the average bias and the mean squared error (MSE) to compare the accuracy of the estimators. If $\hat{\theta} = (\hat{\mu}, \hat{beta})$ and $\theta = (\mu,\beta)$, the bias and MSE are calculated as follows:
+
+\begin{equation}
+Bias(\hat{\theta},\theta) = \hat{\theta} - \theta
+\label{5.1}
+\end{equation}
+
+\begin{equation}
+MSE = Bias(\hat{\theta},\theta)^2 + Var(\hat{\theta})
+\label{5.2}
+\end{equation}
+
+\bigskip
+
+Table 2 and Figures 7 and 8 on page 13 show the results when $\mu=5$ and $\beta=5$, where the bias and MSE are listed and plotted.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{Bias for Estimators of $\mu = 5$, $\beta = 5$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & 0.036 & 0.030 & -0.706 & -0.050 & -0.026 & -0.031\\
+\hline
+$n = 500$ & -0.008 & 0.010 & -0.106 & -0.006 & -0.018 & 0.024\\
+\hline
+$n = 1000$ & -0.012 & -0.000 & -0.041 & -0.003 & -0.001 & 0.031\\
+\hline
+\hline
+\multicolumn{7}{|c|}{MSE for Estimators of $\mu = 5$, $\beta = 5$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & 0.777 & 0.749 & 1.216 & 0.189 & 0.167 & 0.155\\
+\hline
+$n = 500$ & 0.155 & 0.165 & 0.166 & 0.041 & 0.036 & 0.034\\
+\hline
+$n = 1000$ & 0.079 & 0.076 & 0.074 & 0.019 & 0.018 & 0.019\\
+\hline
+\end{tabular}
+\medskip
+\caption{Performance of Estimators for $\mu = 5$, $\beta = 5$}
+\label{tab2}
+\end{center}
+\end{table}
+
+\smallskip
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-mu-55}
+\label{plot7}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-beta-55}
+\label{plot8}
+\end{center}
+\end{figure}
+
+I expect both the bias and the MSE to move closer to $0$ as $n$ increases. The estimations of $\mu$ from the three different methods when $\mu = 5$ and $\beta = 5$ have low biases and MSE's. These values all consistently move closer to $0$ as $n$ increases, with the exception of the final bias estimation from the Bayesian estimator. The same trends occur in the estimation of the $\beta$ bias and MSE.
+
+The bias tables and plots for the other three parameter combinations can be found in the appendix. The general trend is that the bias gets closer to $0$ and MLE decreases toward $0$ as $n$ increases. The reoccuring exeption to this trend is the Bayesian estimation's bias, which sometimes randomly varies between different $n$'s. 
+
+The MSE is perhaps a better visual representation of the accuracy of the estimators because it is always a positive number, which better represents visually the decrease in bias of estimates as sample size increases. The MSE points consistently decrease as the sample size increases. This indicates that the estimators perform well, and can be confidently used for analyses of data.  
+
+\subsection{Model Mispecification}
+
+I next run a simulation study for a model mispecification to compare to the contraceptive dataset analysis. I use a random normal generator because of the similarities between the logistic and normal distributions. I also chose this distribution because the contraceptive dataset closely resembles the normal distribution, so this is a helpful way to ensure that the estimates of the dataset were accurate. I employ box-muller methods to simulate my random normal draws. I then employ my estimator functions to estimate the logistic parameters for the random normal variables. I simulate $n=100$, $n=500$, and $n=1000$ random draws from normal distributions with $\mu=50$ and $\sigma^2=25$ because these are similar to the parameters of the contraceptive dataset. 
+
+I run the data to find the average parameter estimates for the three different $n$'s. My results appear in Table 3.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+  &\multicolumn{3}{|c|}{$\mu=5$}& \multicolumn{3}{|c|}{$\beta=4$} \\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+n=100 & 49.996 & 50.046 & 49.038 & 13.731 & 14.202 & 14.105 \\
+\hline
+n=500 & 49.904 & 50.044 & 50.760 & 13.785 & 14.274 & 14.552 \\
+\hline
+n=1000 & 49.982 & 49.997 & 48.370 & 13.786 & 14.284 & 13.583  \\
+\hline
+\end{tabular}
+\medskip
+\caption{Parameter Estimates for Random Normal Draws}
+\label{tab3}
+\end{center}
+\end{table}
+
+We would expect estimators of the logistic distribution to perform relatively well on random normal draws. As mentioned before, the differences between these two distributions do not become obvious until our sample size gets very large. This is apparent from our logistic estimates in Table 3 and Figure 9, which show a close resemblence between the data curve and the curve from the estimates of random normals. As can be seen in Figure 9, the estimates for the random normal approximate closely to the contraceptive data curve. Again, the curves are not exact because the contraceptive data isn't exactly normal, but they are similar. Their tails are very close and their means appear to approximate closely to each other.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=10cm,height=8cm]{data-distribution-mm}
+\label{plot9}
+\end{center}
+\end{figure}
+
+\section{Conclusion}
+
+The three estimation methods for the logistic distribution perform well for the logistic distribution. The Bayes estimator was possibly the least accurate estimator, which may indicate the need for a better prior. However, the method of moments and maximum likelihood estimators perform very well in all of the estimations in this study. The evaluation of the estimator performance in the simulation and mispecification study indicate that we can trust the estimates for the contraceptive dataset, as the estimators performed well in most simulations. The estimates of the parameters for the contraceptive dataset appear to be reliable, and these estimators could likely be extended for use in analysis of other datasets with different parameters, as indicated by their performance in the simulation study.
+
+\newpage
+
+\appendix
+
+\section{Table Appendix}
+
+\begin{table}[H]
+\begin{center}
+\caption{Performance of Estimators when $\mu = 20$, $\beta = 5$}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{Bias for Estimators of $\mu = 20$, $\beta = 5$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & -0.020 & -0.014 & -0.888 & -0.046 & -0.021 & -0.032\\
+\hline
+$n = 500$ & -0.010 & -0.004 & -0.293 & -0.011 & -0.001 & 0.036\\
+\hline
+$n = 1000$ & -0.012 & 0.000 & -0.211 & -0.006 & -0.001 & 0.036\\
+\hline
+\hline
+\multicolumn{7}{|c|}{MSE for Estimators of $\mu = 20$, $\beta = 5$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & 0.833 & 0.704 & 1.501 & 0.201 & 0.177 & 0.156\\
+\hline
+$n = 500$ & 0.150 & 0.153 & 0.231 & 0.040 & 0.034 & 0.036\\
+\hline
+$n = 1000$ & 0.085 & 0.082 & 0.118 & 0.021 & 0.018 & 0.018\\
+\hline
+\end{tabular}
+\medskip
+\label{tab4}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\caption{Performance of Estimators when $\mu = 50$, $\beta = 20$}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{Bias for Estimators of $\mu = 50$, $\beta = 20$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & -0.218 & 0.026 & -16.38 & -0.257 & -0.104 & -0.846\\
+\hline
+$n = 500$ & -0.047 & -0.022 & -2.62 & -0.061 & -0.017 & 0.074\\
+\hline
+$n = 1000$ & -0.080 & 0.019 & -0.536 & -0.013 & -0.019 & -0.268\\
+\hline
+\hline
+\multicolumn{7}{|c|}{MSE for Estimators of $\mu = 50$, $\beta = 20$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & 14.344 & 12.515 & 282.016 & 3.325 & 2.915 & 3.134\\
+\hline
+$n = 500$ & 2.751 & 2.513 & 9.486 & 0.670 & 0.543 & 0.565\\
+\hline
+$n = 1000$ & 1.354 & 1.249 & 1.436 & 0.292 & 0.290 & 0.345\\
+\hline
+\end{tabular}
+\medskip
+\label{tab5}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\caption{Performance of Estimators for $\mu = 100$, $\beta = 10$}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{Bias for Estimators of $\mu = 100$, $\beta = 10$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & -0.119 & -0.041 & -1.731 & -0.090 & -0.044 & -1.131\\
+\hline
+$n = 500$ & -0.018 & -0.017 & -0.559 & -0.021 & -0.014 & -0.164\\
+\hline
+$n = 1000$ & -0.013 & -0.021 & -0.704 & -0.012 & -0.006 & 0.152\\
+\hline
+\hline
+\multicolumn{7}{|c|}{MSE for Estimators of $\mu = 100$, $\beta = 10$}\\
+\hline
+  &\multicolumn{3}{|c|}{$\mu$} &\multicolumn{3}{|c|}{$\beta$}\\
+\hline
+ & MOM & MLE & Bayesian & MOM & MLE & Bayesian \\
+\hline
+$n = 100$ & 3.158 & 3.086 & 5.864 & 0.752 & 0.651 & 1.773\\
+\hline
+$n = 500$ & 0.633 & 0.617 & 0.908 & 0.155 & 0.146 & 0.164\\
+\hline
+$n = 1000$ & 0.318 & 0.281 & 0.785 & 0.086 & 0.072 & 0.152\\
+\hline
+\end{tabular}
+\medskip
+\label{tab6}
+\end{center}
+\end{table}
+
+
+\section{Graph Appendix}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-mu-205}
+\label{plot10}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-beta-205}
+\label{plot11}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-mu-5020}
+\label{plot12}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-beta-5020}
+\label{plot13}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-mu-10010}
+\label{plot14}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=13cm,height=8cm]{sim-parameter-beta-10010}
+\label{plot15}
+\end{center}
+\end{figure}
+
+\end{document}
