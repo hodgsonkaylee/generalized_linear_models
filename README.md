@@ -11,7 +11,7 @@ This project evaluates the logistic distribution, its parameters, and estimates 
 
 **logistic_regression_1**
 
-*I was selected as a BYU Student Research Conference Session Winner for this project.*
+*I was selected as a Student Research Conference Session Winner for this project.*
 
 This project employs randomization inference, two-stage regression, and logistic regression to analyze data from a fully randomized experiment in Tanzania, India, and Peru. The purpose was to identify how the gender characteristics of a messenger can affect policy makers’ acceptance of policy information. Randomization inference is used for difference-of-means testing and logistic regression analysis is used to analyze the experimental results. This project was completed as part of a summer research project.
 
